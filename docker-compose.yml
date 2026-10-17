@@ -1,0 +1,31 @@
+
+services:
+  github-runner:
+    image: myoung34/github-runner:ubuntu-noble
+    hostname: github-runner
+    restart: unless-stopped
+
+    environment:
+      RUNNER_SCOPE: repo
+      REPO_URL: ${GITHUB_REPO_URL}
+      ACCESS_TOKEN: ${GITHUB_ACCESS_TOKEN}
+      RUNNER_NAME_PREFIX: sentinel-runner
+      RANDOM_RUNNER_SUFFIX: "true"
+      LABELS: wsl2,docker,ubuntu
+      RUN_AS_ROOT: "true"
+      DISABLE_AUTO_UPDATE: "true"
+      PLAYWRIGHT_BROWSERS_PATH: /home/runner/.cache/ms-playwright
+      PNPM_STORE_DIR: /pnpm-store
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./cache/playwright:/home/runner/.cache
+      - pnpm-store:/pnpm-store
+
+    security_opt:
+      - no-new-privileges:true
+
+    init: true
+    stop_grace_period: 2m
+volumes:
+  pnpm-store:
